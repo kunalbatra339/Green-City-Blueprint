@@ -1,0 +1,6 @@
+.home-container {
+  display: flex; /* This is the key to our layout! */
+  width: 100%;
+  height: 100vh;
+  overflow: hidden; /* Prevents scrollbars on the main page */
+}

@@ -1,0 +1,120 @@
+.report-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background-color: #f4f7f6;
+}
+
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background-color: #fff;
+  border-bottom: 1px solid #ddd;
+  flex-shrink: 0;
+}
+
+.report-header h1 {
+  color: #333;
+  font-size: 1.8rem;
+}
+
+.back-button {
+  font-size: 1rem;
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 600;
+}
+.back-button:hover {
+  text-decoration: underline;
+}
+
+.report-content {
+  display: flex;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.report-form-container {
+  width: 450px;
+  padding: 30px;
+  background-color: #fff;
+  overflow-y: auto;
+  border-right: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+}
+
+.report-form-container h3 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.report-form-container p {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+.report-form-container label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.report-form-container input[type="text"],
+.report-form-container select,
+.report-form-container textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+
+.report-form-container input[type="text"]:disabled {
+  background-color: #f4f4f4;
+  cursor: not-allowed;
+}
+
+.report-form-container button {
+  padding: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background-color: #28a745; /* Green */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.report-form-container button:hover {
+  background-color: #218838;
+}
+
+.report-form-container button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+
+.report-map-container {
+  flex-grow: 1;
+}
+
+.report-map-container .leaflet-container {
+  height: 100%;
+  width: 100%;
+  cursor: help; /* Set the report cursor */
+}
+
+/* Make sure red icon is defined */
+.leaflet-red-icon {
+  filter: hue-rotate(240deg) saturate(5) brightness(0.7);
+}

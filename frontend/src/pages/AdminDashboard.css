@@ -1,0 +1,170 @@
+.admin-page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f4f7f6;
+  font-family: Arial, sans-serif;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background-color: #fff;
+  border-bottom: 1px solid #333;
+}
+
+.admin-header h1 {
+  color: #007bff;
+  font-size: 1.8rem;
+}
+
+.back-button {
+  text-decoration: none;
+  color: #333;
+  padding: 8px 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.admin-content {
+  display: flex;
+  flex-grow: 1;
+  padding: 20px;
+  gap: 20px;
+}
+
+.reports-panel {
+  flex-basis: 70%;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.reports-panel h2 {
+  border-bottom: 2px solid #007bff;
+  color: #333;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.reports-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.report-card {
+  padding: 15px;
+  border-left: 5px solid;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+  position: relative;
+}
+
+.report-card h3 {
+  margin-top: 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.report-location {
+  font-size: 0.9rem;
+  color: #777;
+}
+
+.report-description {
+  margin-top: 5px;
+  font-size: 1rem;
+}
+
+.report-status {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+/* Status colors (Only PENDING is needed for now) */
+.status-pending { border-left-color: #ffc107; }
+.status-pending .report-status { background-color: #ffc10720; color: #856404; }
+
+.actions-panel {
+  flex-basis: 30%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.quick-action-card, .data-summary-card {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.emergency-button {
+  display: block;
+  text-align: center;
+  padding: 15px;
+  margin-top: 15px;
+  background-color: #dc3545; /* Red */
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.emergency-button:hover {
+  background-color: #c82333;
+}
+
+/* ... (all your other styles are correct) ... */
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background-color: #fff;
+  border-bottom: 1px solid #333;
+}
+
+/* NEW: Style for the button container */
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Adds space between the buttons */
+}
+
+.back-button {
+  text-decoration: none;
+  color: #333;
+  padding: 8px 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* NEW: Style for the Logout button */
+.logout-button {
+  padding: 8px 15px;
+  border: 1px solid #dc3545;
+  background-color: #dc3545;
+  color: white;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.logout-button:hover {
+  background-color: #c82333;
+}
+
+/* ... (rest of the CSS is unchanged) ... */

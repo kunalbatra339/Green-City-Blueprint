@@ -1,0 +1,28 @@
+.map-container {
+  flex-grow: 1;
+  height: 100vh;
+}
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+}
+
+/* Cursor for Sim Mode */
+.map-container.sim-mode-active .leaflet-container {
+  cursor: crosshair;
+}
+
+/* NEW: Cursor for Report Mode */
+.map-container.report-mode-active .leaflet-container {
+  cursor: help; /* A question mark cursor */
+}
+
+/* Filter for green/pink icon */
+.leaflet-green-icon {
+  filter: hue-rotate(100deg) brightness(0.9);
+}
+
+/* NEW: Filter for red icon */
+.leaflet-red-icon {
+  filter: hue-rotate(240deg) saturate(5) brightness(0.7);
+}
