@@ -3,7 +3,7 @@ import hashlib
 import os
 
 # --- Connection Setup ---
-client = MongoClient('mongodb://localhost:27017/')
+client = MongoClient('mongodb+srv://kbatra339:kunal8ballpool@cluster0.wgcc4j6.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
 db = client['green_city_db']
 users_collection = db['users']
 
