@@ -18,7 +18,7 @@
   filter: hue-rotate(100deg) brightness(0.9);
 }
 
-/* Filter for red icon (Used on Report Page) */
+/* Filter for red icon (Used on Report Page, keep for consistency) */
 .leaflet-red-icon {
   filter: hue-rotate(240deg) saturate(5) brightness(0.7);
 }
