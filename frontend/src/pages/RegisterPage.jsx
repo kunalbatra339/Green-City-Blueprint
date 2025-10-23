@@ -11,7 +11,7 @@ function RegisterPage() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        fetch('${import.meta.env.VITE_API_BASE_URL}/api/auth/register', {
+        fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password, role }),
