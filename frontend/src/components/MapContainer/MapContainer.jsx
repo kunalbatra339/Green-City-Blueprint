@@ -4,7 +4,7 @@ import { MapContainer as LeafletMap, TileLayer, Marker, Popup, useMapEvents } fr
 import L from 'leaflet';
 import './MapContainer.css';
 
-// --- ICONS (Defined correctly) ---
+// --- ICONS (Defined correctly - No changes here) ---
 const trafficIcon = new L.Icon({
     iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
@@ -44,44 +44,62 @@ function MapContainer({ pointsData, onMarkerClick, onMapClick, isSimMode, active
     const position = [20.5937, 78.9629];
     const zoomLevel = 5;
 
-    // --- CORRECTED getLayerProps Function ---
+    // --- **CRITICAL FIX: CORRECTED getLayerProps Logic** ---
     const getLayerProps = (point) => {
-        let icon = defaultIcon; // Default to blue
-        let content = <strong>Data Not Available</strong>;
+        let icon = defaultIcon; // Start with default blue
+        let content = <strong>Data Error</strong>; // Default error message
 
-        // Determine icon and content based ONLY on the activeLayer first
-        if (activeLayer === 'AQI') {
-            icon = defaultIcon; // Standard AQI points are blue
-            content = (
-                <><strong>Air Quality (AQI): {point.aqi}</strong></>
-            );
-        } else if (activeLayer === 'Traffic') {
-            icon = point.traffic_density > 0.75 ? trafficIcon : defaultIcon; // Red or Blue
-            content = (
-                <>
-                    <strong>Traffic Density: {point.traffic_density}</strong><br />
-                    Current Flow: {point.traffic_density > 0.75 ? 'High Congestion 🔴' : 'Moderate Flow 🟢'}
-                </>
-            );
-        } else if (activeLayer === 'Green Cover') {
-            icon = point.green_cover_index > 0.5 ? greenCoverIcon : defaultIcon; // Green or Blue
-            content = (
-                <>
-                    <strong>Green Cover Index: {point.green_cover_index}</strong><br />
-                    Density: {point.green_cover_index > 0.5 ? 'High Density 🌳' : 'Low Density 🍂'}
-                </>
-            );
+        try { // Added safety wrapper
+            // 1. Determine base icon and content based on ACTIVE LAYER
+            if (activeLayer === 'AQI') {
+                icon = defaultIcon; // Standard AQI points are blue
+                content = (
+                    <><strong>Air Quality (AQI): {point.aqi}</strong></>
+                );
+            } else if (activeLayer === 'Traffic') {
+                // Check if data exists before using it
+                if (point.traffic_density !== undefined && point.traffic_density !== null) {
+                    icon = point.traffic_density > 0.75 ? trafficIcon : defaultIcon; // Red or Blue
+                    content = (
+                        <>
+                            <strong>Traffic Density: {point.traffic_density}</strong><br />
+                            Current Flow: {point.traffic_density > 0.75 ? 'High Congestion 🔴' : 'Moderate Flow 🟢'}
+                        </>
+                    );
+                } else { content = <><strong>Traffic Data Missing</strong></>; }
+
+            } else if (activeLayer === 'Green Cover') {
+                 // Check if data exists before using it
+                if (point.green_cover_index !== undefined && point.green_cover_index !== null) {
+                    icon = point.green_cover_index > 0.5 ? greenCoverIcon : defaultIcon; // Green or Blue
+                    content = (
+                        <>
+                            <strong>Green Cover Index: {point.green_cover_index}</strong><br />
+                            Density: {point.green_cover_index > 0.5 ? 'High Density 🌳' : 'Low Density 🍂'}
+                        </>
+                    );
+                 } else { content = <><strong>Green Cover Data Missing</strong></>; }
+            }
+
+            // 2. NOW, override ONLY if the point is simulated AND the AQI layer is active
+            if (activeLayer === 'AQI' && point.simulated) {
+                icon = simulationIcon; // Use the special pink/green icon
+                content = ( // Show the simulation-specific popup content
+                    <>
+                        Original AQI: <del>{point.original_aqi}</del><br />
+                        <strong>Simulated AQI: {point.aqi}</strong>
+                    </>
+                );
+            }
+
+        } catch (error) {
+            console.error("Error processing point data:", point, error);
+            // In case of any error, keep the default icon and show error content
         }
 
-        // NOW, override ONLY if the point is simulated AND the AQI layer is active
-        if (activeLayer === 'AQI' && point.simulated) {
-            icon = simulationIcon; // Use the special pink/green icon
-            content = ( // Show the simulation-specific popup content
-                <>
-                    Original AQI: <del>{point.original_aqi}</del><br />
-                    <strong>Simulated AQI: {point.aqi}</strong>
-                </>
-            );
+        // Final safety check to prevent crash if icon somehow becomes invalid
+        if (!icon) {
+            icon = defaultIcon;
         }
 
         return { icon, content };
@@ -97,22 +115,32 @@ function MapContainer({ pointsData, onMarkerClick, onMapClick, isSimMode, active
 
                 <MapClickHandler onMapClick={onMapClick} isSimMode={isSimMode} />
 
-                {pointsData.map(point => {
+                {/* Check if pointsData is an array before mapping */}
+                {Array.isArray(pointsData) && pointsData.map(point => {
+                    // Ensure point is valid and has coordinates before processing
+                    if (!point || typeof point.latitude !== 'number' || typeof point.longitude !== 'number') {
+                        console.warn("Skipping invalid point data:", point);
+                        return null; // Skip rendering this marker
+                    }
+
                     const { icon, content } = getLayerProps(point);
 
                     return (
                         <Marker
-                            key={point.location_id}
+                            key={point.location_id || Math.random()} // Use location_id or fallback key
                             position={[point.latitude, point.longitude]}
                             icon={icon}
                             eventHandlers={{ // Your working chart logic
                                 click: () => {
-                                    onMarkerClick(point.location_id);
+                                    // Make sure location_id exists before calling handler
+                                    if(point.location_id) {
+                                        onMarkerClick(point.location_id);
+                                    }
                                 },
                             }}
                         >
                             <Popup>
-                                <strong>{point.name}</strong><br />
+                                <strong>{point.name || 'Unknown Location'}</strong><br />
                                 {content}
                             </Popup>
                         </Marker>
