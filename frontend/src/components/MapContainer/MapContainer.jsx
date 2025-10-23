@@ -44,19 +44,20 @@ function MapContainer({ pointsData, onMarkerClick, onMapClick, isSimMode, active
     const position = [20.5937, 78.9629];
     const zoomLevel = 5;
 
-    // --- getLayerProps Function with TYPO FIXED ---
+    // --- **CRITICAL FIX: CORRECTED getLayerProps Logic** ---
     const getLayerProps = (point) => {
-        let icon = defaultIcon; // Default to blue
+        let icon = defaultIcon; // Start with default blue
         let content = <strong>Data Error</strong>; // Default error message
 
-        try {
-            // Determine base icon and content based ONLY on the activeLayer first
+        try { // Added safety wrapper
+            // 1. Determine base icon and content based on ACTIVE LAYER
             if (activeLayer === 'AQI') {
                 icon = defaultIcon; // Standard AQI points are blue
                 content = (
                     <><strong>Air Quality (AQI): {point.aqi}</strong></>
                 );
             } else if (activeLayer === 'Traffic') {
+                // Check if data exists before using it
                 if (point.traffic_density !== undefined && point.traffic_density !== null) {
                     icon = point.traffic_density > 0.75 ? trafficIcon : defaultIcon; // Red or Blue
                     content = (
@@ -68,7 +69,8 @@ function MapContainer({ pointsData, onMarkerClick, onMapClick, isSimMode, active
                 } else { content = <><strong>Traffic Data Missing</strong></>; }
 
             } else if (activeLayer === 'Green Cover') {
-                 if (point.green_cover_index !== undefined && point.green_cover_index !== null) {
+                 // Check if data exists before using it
+                if (point.green_cover_index !== undefined && point.green_cover_index !== null) {
                     icon = point.green_cover_index > 0.5 ? greenCoverIcon : defaultIcon; // Green or Blue
                     content = (
                         <>
@@ -79,12 +81,11 @@ function MapContainer({ pointsData, onMarkerClick, onMapClick, isSimMode, active
                  } else { content = <><strong>Green Cover Data Missing</strong></>; }
             }
 
-            // NOW, override ONLY if the point is simulated AND the AQI layer is active
+            // 2. NOW, override ONLY if the point is simulated AND the AQI layer is active
             if (activeLayer === 'AQI' && point.simulated) {
                 icon = simulationIcon; // Use the special pink/green icon
                 content = ( // Show the simulation-specific popup content
                     <>
-                        {/* THE TYPO IS FIXED HERE */}
                         Original AQI: <del>{point.original_aqi}</del><br />
                         <strong>Simulated AQI: {point.aqi}</strong>
                     </>
@@ -96,7 +97,7 @@ function MapContainer({ pointsData, onMarkerClick, onMapClick, isSimMode, active
             // In case of any error, keep the default icon and show error content
         }
 
-        // Final safety check
+        // Final safety check to prevent crash if icon somehow becomes invalid
         if (!icon) {
             icon = defaultIcon;
         }
