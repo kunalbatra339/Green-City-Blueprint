@@ -19,11 +19,17 @@ import numpy as np
 # --- App & DB Setup ---
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
-CORS(app, supports_credentials=True, resources={
-    r"/api/*": {
-        "origins": ["http://localhost:5173", "https://green-city-blueprint.vercel.app"] 
-    }
-})
+CORS(app, 
+    supports_credentials=True,
+    origins=[
+        "https://green-city-blueprint.vercel.app",
+        "http://localhost:5173", 
+        "http://localhost:5174", 
+        "http://127.0.0.1:5173"
+    ],
+    methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "Accept"]
+)
 MONGO_URI = os.environ.get('MONGO_URI') 
 client = MongoClient(MONGO_URI)
 db = client['green_city_db']
