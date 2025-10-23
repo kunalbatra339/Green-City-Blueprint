@@ -24,8 +24,7 @@ CORS(app, supports_credentials=True, resources={
         "origins": ["http://localhost:5173", "https://green-city-blueprint.vercel.app"] 
     }
 })
-MONGO_URI = os.environ.get('MONGO_URI') 
-client = MongoClient(MONGO_URI)
+client = MongoClient('mongodb+srv://kbatra339:kunal8ballpool@cluster0.wgcc4j6.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0') 
 db = client['green_city_db']
 points_collection = db['air_quality_points']
 history_collection = db['air_quality_history'] 

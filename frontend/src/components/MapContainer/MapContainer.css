@@ -1,28 +1,25 @@
 .map-container {
-  flex-grow: 1;
-  height: 100vh;
+  flex-grow: 1; /* Takes up remaining space */
+  height: 100vh; /* Full viewport height */
 }
+
 .leaflet-container {
-  height: 100%;
+  height: 100%; /* Ensures map fills the container */
   width: 100%;
 }
 
-/* Cursor for Sim Mode */
+/* Cursor style when Simulation Mode is active */
 .map-container.sim-mode-active .leaflet-container {
   cursor: crosshair;
 }
 
-/* Cursor for Report Mode (Used on Report Page, but safe to keep here) */
-.map-container.report-mode-active .leaflet-container {
-  cursor: help; /* A question mark cursor */
-}
-
-/* CORRECTED: Filter for the simulation icon (pink/green) */
+/* Filter for the SIMULATION icon (applies pink/green color) */
 .leaflet-simulation-icon {
   filter: hue-rotate(100deg) brightness(0.9);
 }
 
-/* Filter for red icon (Used on Report Page, but safe to keep here) */
+/* Filter for red icon (Used on Report Page) */
 .leaflet-red-icon {
   filter: hue-rotate(240deg) saturate(5) brightness(0.7);
 }
+
