@@ -120,7 +120,7 @@ Finally, start the server!
 python app.py
 
 
-The server will be running on http://localhost:5000. Keep this terminal open.
+The server will be running on ${import.meta.env.VITE_API_BASE_URL}. Keep this terminal open.
 
 ⚛️ Step 2: Frontend Setup (React App)
 

@@ -33,7 +33,7 @@ function ChartComponent({ locationId }) {
     }
 
     // Fetch historical data for the selected location
-    fetch(`http://localhost:5000/api/data/air_quality/${locationId}`)
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/api/data/air_quality/${locationId}`)
       .then(res => res.json())
       .then(data => {
         // Format the data for Chart.js

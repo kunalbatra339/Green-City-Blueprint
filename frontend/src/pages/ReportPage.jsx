@@ -47,7 +47,7 @@ function ReportPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetch('http://localhost:5000/api/feedback/submit', {
+    fetch('${import.meta.env.VITE_API_BASE_URL}/api/feedback/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formState),

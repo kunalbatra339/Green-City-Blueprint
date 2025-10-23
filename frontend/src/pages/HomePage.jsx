@@ -4,7 +4,7 @@ import MapContainer from '../components/MapContainer/MapContainer';
 import Dashboard from '../components/Dashboard/Dashboard';
 
 // UPDATED: The new single source for map point data
-const API_URL = 'http://localhost:5000/api/data/points';
+const API_URL = `${import.meta.env.VITE_API_BASE_URL}/api/data/points`;
 
 function HomePage() {
   const [selectedLocationId, setSelectedLocationId] = useState(null);
@@ -37,7 +37,7 @@ function HomePage() {
   
   const handleMapClick = (lat, lng) => {
     if (isSimMode) {
-      fetch('http://localhost:5000/api/simulate/park', {
+      fetch('${import.meta.env.VITE_API_BASE_URL}/api/simulate/park', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ latitude: lat, longitude: lng }),

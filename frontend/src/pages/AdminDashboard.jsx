@@ -25,7 +25,7 @@ function AdminDashboard() {
             return;
         }
 
-        fetch('http://localhost:5000/api/admin/reports', {
+        fetch('${import.meta.env.VITE_API_BASE_URL}/api/admin/reports', {
             headers: { 'Authorization': `Bearer ${token}` }
         })
         .then(res => {
@@ -59,7 +59,7 @@ function AdminDashboard() {
         // ... (this function is unchanged)
         const token = localStorage.getItem('token');
         if (user && user.role === 'admin') {
-            fetch(`http://localhost:5000/api/admin/reports/${reportId}/resolve`, {
+            fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/reports/${reportId}/resolve`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${token}` }
             })

@@ -10,7 +10,7 @@ function LoginPage() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        fetch('http://localhost:5000/api/auth/login', {
+        fetch('${import.meta.env.VITE_API_BASE_URL}/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password }),
