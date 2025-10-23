@@ -21,7 +21,8 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
 CORS(app, resources={r"/api/*": {"origins": "https://green-city-blueprint.vercel.app/"}})
 
-client = MongoClient('mongodb://localhost:27017/') 
+MONGO_URI = os.environ.get('MONGO_URI') 
+client = MongoClient(MONGO_URI)
 db = client['green_city_db']
 points_collection = db['air_quality_points']
 history_collection = db['air_quality_history'] 
