@@ -4,7 +4,24 @@ import { MapContainer as LeafletMap, TileLayer, Marker, Popup, useMapEvents } fr
 import L from 'leaflet';
 import './MapContainer.css';
 
-// --- ICONS (Defined correctly - No changes here) ---
+// --- **FIX: Import Leaflet's default marker images** ---
+import iconUrl from 'leaflet/dist/images/marker-icon.png';
+import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
+import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
+
+// --- **FIX: Configure Leaflet's default icon path** ---
+// This needs to be done BEFORE the component definition
+delete L.Icon.Default.prototype._getIconUrl; // Remove the old way Leaflet finds icons
+L.Icon.Default.mergeOptions({
+    iconUrl: iconUrl,
+    iconRetinaUrl: iconRetinaUrl,
+    shadowUrl: shadowUrl,
+});
+// --- End of Fix ---
+
+
+// --- Custom ICONS (Traffic, Green Cover, Simulation) ---
+// These use external URLs, so they remain unchanged
 const trafficIcon = new L.Icon({
     iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
@@ -15,23 +32,27 @@ const greenCoverIcon = new L.Icon({
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
     iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41],
 });
-// Specific icon for SIMULATED AQI points
 const simulationIcon = new L.Icon({
-    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png', // Base blue icon URL
-    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+    iconUrl: iconUrl, // Use the imported base blue icon
+    iconRetinaUrl: iconRetinaUrl,
+    shadowUrl: shadowUrl,
     iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41],
-    className: 'leaflet-simulation-icon' // Class for the color filter
+    className: 'leaflet-simulation-icon' // Apply the CSS filter
 });
-const defaultIcon = new L.Icon.Default(); // Default blue icon
+// We no longer need to define defaultIcon separately
+// const defaultIcon = new L.Icon.Default();
 
 
-// --- Map Click Handler (Unchanged from your working version) ---
+// --- Map Click Handler (Unchanged) ---
 function MapClickHandler({ onMapClick, isSimMode }) {
     useMapEvents({
         click(e) {
             if (isSimMode) {
-                onMapClick(e.latlng.lat, e.latlng.lng);
+                if (e.latlng && typeof e.latlng.lat === 'number' && typeof e.latlng.lng === 'number') {
+                    onMapClick(e.latlng.lat, e.latlng.lng);
+                } else {
+                    console.error("Invalid click event coordinates:", e.latlng);
+                }
             }
         },
     });
@@ -40,66 +61,69 @@ function MapClickHandler({ onMapClick, isSimMode }) {
 
 // --- Main Map Component ---
 function MapContainer({ pointsData, onMarkerClick, onMapClick, isSimMode, activeLayer }) {
-    // Center map on India and zoom out
     const position = [20.5937, 78.9629];
     const zoomLevel = 5;
 
-    // --- **CRITICAL FIX: CORRECTED getLayerProps Logic** ---
     const getLayerProps = (point) => {
-        let icon = defaultIcon; // Start with default blue
-        let content = <strong>Data Error</strong>; // Default error message
+        // Use L.Icon.Default() directly here as the fallback
+        let icon = L.Icon.Default(); 
+        let content = <><strong>Data Error</strong></>;
 
-        try { // Added safety wrapper
-            // 1. Determine base icon and content based on ACTIVE LAYER
+        if (!point || typeof point !== 'object') {
+             console.error("Invalid point data:", point);
+             return { icon, content };
+        }
+
+        try {
             if (activeLayer === 'AQI') {
-                icon = defaultIcon; // Standard AQI points are blue
+                icon = L.Icon.Default(); // Standard AQI points are blue
                 content = (
-                    <><strong>Air Quality (AQI): {point.aqi}</strong></>
+                    <><strong>Air Quality (AQI): {point.aqi ?? 'N/A'}</strong></>
                 );
             } else if (activeLayer === 'Traffic') {
-                // Check if data exists before using it
-                if (point.traffic_density !== undefined && point.traffic_density !== null) {
-                    icon = point.traffic_density > 0.75 ? trafficIcon : defaultIcon; // Red or Blue
+                if (typeof point.traffic_density === 'number') {
+                    icon = point.traffic_density > 0.75 ? trafficIcon : L.Icon.Default(); // Red or Blue
                     content = (
                         <>
                             <strong>Traffic Density: {point.traffic_density}</strong><br />
                             Current Flow: {point.traffic_density > 0.75 ? 'High Congestion 🔴' : 'Moderate Flow 🟢'}
                         </>
                     );
-                } else { content = <><strong>Traffic Data Missing</strong></>; }
+                } else { content = <><strong>Traffic Data Missing</strong></>; icon = L.Icon.Default();}
 
             } else if (activeLayer === 'Green Cover') {
-                 // Check if data exists before using it
-                if (point.green_cover_index !== undefined && point.green_cover_index !== null) {
-                    icon = point.green_cover_index > 0.5 ? greenCoverIcon : defaultIcon; // Green or Blue
+                if (typeof point.green_cover_index === 'number') {
+                    icon = point.green_cover_index > 0.5 ? greenCoverIcon : L.Icon.Default(); // Green or Blue
                     content = (
                         <>
                             <strong>Green Cover Index: {point.green_cover_index}</strong><br />
                             Density: {point.green_cover_index > 0.5 ? 'High Density 🌳' : 'Low Density 🍂'}
                         </>
                     );
-                 } else { content = <><strong>Green Cover Data Missing</strong></>; }
+                 } else { content = <><strong>Green Cover Data Missing</strong></>; icon = L.Icon.Default();}
             }
 
-            // 2. NOW, override ONLY if the point is simulated AND the AQI layer is active
-            if (activeLayer === 'AQI' && point.simulated) {
-                icon = simulationIcon; // Use the special pink/green icon
-                content = ( // Show the simulation-specific popup content
-                    <>
-                        Original AQI: <del>{point.original_aqi}</del><br />
-                        <strong>Simulated AQI: {point.aqi}</strong>
-                    </>
-                );
+            // Override for simulation
+            if (activeLayer === 'AQI' && point.simulated === true) {
+                if (typeof point.original_aqi === 'number' && typeof point.aqi === 'number') {
+                    icon = simulationIcon; // Use the special pink/green icon
+                    content = (
+                        <>
+                            Original AQI: <del>{point.original_aqi}</del><br />
+                            <strong>Simulated AQI: {point.aqi}</strong>
+                        </>
+                    );
+                } else { content = <><strong>Simulation Data Invalid</strong></>; /* Keep blue icon */ }
             }
-
         } catch (error) {
-            console.error("Error processing point data:", point, error);
-            // In case of any error, keep the default icon and show error content
+            console.error("Error in getLayerProps:", point, error);
+            icon = L.Icon.Default(); // Fallback on error
+            content = <><strong>Processing Error</strong></>;
         }
-
-        // Final safety check to prevent crash if icon somehow becomes invalid
-        if (!icon) {
-            icon = defaultIcon;
+        
+        // Final safety check
+        if (!(icon instanceof L.Icon || icon instanceof L.Icon.Default)) {
+             icon = L.Icon.Default();
         }
 
         return { icon, content };
@@ -115,27 +139,22 @@ function MapContainer({ pointsData, onMarkerClick, onMapClick, isSimMode, active
 
                 <MapClickHandler onMapClick={onMapClick} isSimMode={isSimMode} />
 
-                {/* Check if pointsData is an array before mapping */}
-                {Array.isArray(pointsData) && pointsData.map(point => {
-                    // Ensure point is valid and has coordinates before processing
+                {Array.isArray(pointsData) ? pointsData.map((point, index) => {
                     if (!point || typeof point.latitude !== 'number' || typeof point.longitude !== 'number') {
-                        console.warn("Skipping invalid point data:", point);
-                        return null; // Skip rendering this marker
+                        console.warn(`Skipping invalid point data at index ${index}:`, point);
+                        return null;
                     }
-
+                    const markerKey = point.location_id || `marker-${index}-${point.latitude}-${point.longitude}`;
                     const { icon, content } = getLayerProps(point);
 
                     return (
                         <Marker
-                            key={point.location_id || Math.random()} // Use location_id or fallback key
+                            key={markerKey}
                             position={[point.latitude, point.longitude]}
                             icon={icon}
-                            eventHandlers={{ // Your working chart logic
+                            eventHandlers={{
                                 click: () => {
-                                    // Make sure location_id exists before calling handler
-                                    if(point.location_id) {
-                                        onMarkerClick(point.location_id);
-                                    }
+                                    if(point.location_id) { onMarkerClick(point.location_id); }
                                 },
                             }}
                         >
@@ -145,7 +164,11 @@ function MapContainer({ pointsData, onMarkerClick, onMapClick, isSimMode, active
                             </Popup>
                         </Marker>
                     );
-                })}
+                }) : (
+                     <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 1000, background: 'white', padding: '10px', borderRadius: '5px', boxShadow: '0 0 10px rgba(0,0,0,0.5)'}}>
+                       Loading map data...
+                     </div>
+                )}
             </LeafletMap>
         </div>
     );
