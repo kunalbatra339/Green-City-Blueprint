@@ -4,26 +4,42 @@ import { MapContainer as LeafletMap, TileLayer, Marker, Popup, useMapEvents } fr
 import L from 'leaflet';
 import './MapContainer.css';
 
-// --- ICONS (These are all correct and unchanged) ---
-const trafficIcon = new L.Icon({
-  iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+// Fix for default markers not showing in react-leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41],
+});
+
+// --- ICONS (Fixed with reliable URLs) ---
+const trafficIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconSize: [25, 41], 
+  iconAnchor: [12, 41], 
+  popupAnchor: [1, -34], 
+  shadowSize: [41, 41],
 });
 const greenCoverIcon = new L.Icon({
-  iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41],
+  iconSize: [25, 41], 
+  iconAnchor: [12, 41], 
+  popupAnchor: [1, -34], 
+  shadowSize: [41, 41],
 });
-const greenIcon = new L.Icon({ // This is for the simulation
+const greenIcon = new L.Icon({
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41],
-  className: 'leaflet-green-icon' // Class for the simulation color filter
+  iconSize: [25, 41], 
+  iconAnchor: [12, 41], 
+  popupAnchor: [1, -34], 
+  shadowSize: [41, 41],
+  className: 'leaflet-green-icon'
 });
-const defaultIcon = new L.Icon.Default(); // Default blue icon
-
+const defaultIcon = new L.Icon.Default();
 
 // --- Map Click Handler Component (Unchanged from your working version) ---
 function MapClickHandler({ onMapClick, isSimMode }) {
@@ -107,8 +123,8 @@ function MapContainer({ pointsData, onMarkerClick, onMapClick, isSimMode, active
             <Marker
               key={point.location_id}
               position={[point.latitude, point.longitude]}
-              icon={icon} // Uses the icon determined above
-              eventHandlers={{ // Your working event handler for charts
+              icon={icon}
+              eventHandlers={{
                 click: () => {
                   onMarkerClick(point.location_id);
                 },
@@ -116,7 +132,7 @@ function MapContainer({ pointsData, onMarkerClick, onMapClick, isSimMode, active
             >
               <Popup>
                 <strong>{point.name}</strong><br />
-                {content} {/* Uses the content determined above */}
+                {content}
               </Popup>
             </Marker>
           );
