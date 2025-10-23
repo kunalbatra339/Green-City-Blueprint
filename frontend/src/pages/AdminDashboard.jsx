@@ -25,7 +25,7 @@ function AdminDashboard() {
             return;
         }
 
-        fetch('${import.meta.env.VITE_API_BASE_URL}/api/admin/reports', {
+        fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/reports`, {
             headers: { 'Authorization': `Bearer ${token}` }
         })
         .then(res => {
