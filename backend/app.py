@@ -250,5 +250,9 @@ def test_route():
         "documents_in_collection": count
     })
 
+@app.route("/_health")
+def health():
+    return {"status": "ok"}, 200
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
